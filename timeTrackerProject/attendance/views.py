@@ -89,10 +89,16 @@ def ver_horas_trabajadas(request):
     # Calcular el último lunes con el offset
     last_monday = timezone.now() - timedelta(days=day_of_week + 7 * week_offset)
     
-    # Obtener las fichadas del empleado desde el último lunes
+    # Calcular el final de la semana
     week_start = last_monday
-    week_end = last_monday + timedelta(days=7)
-    attendances = Attendance.objects.filter(employee_id=employee.id, check_in__gte=week_start, check_in__lt=week_end).order_by('check_in')
+    week_end = last_monday + timedelta(days=6)
+    
+    # Formatear las fechas para mostrarlas
+    week_start_str = week_start.strftime("%d/%m/%Y")
+    week_end_str = week_end.strftime("%d/%m/%Y")
+    
+    # Obtener las fichadas del empleado desde el último lunes
+    attendances = Attendance.objects.filter(employee_id=employee.id, check_in__gte=week_start, check_in__lt=week_end + timedelta(days=1)).order_by('check_in')
     
     days_of_week = [{"day": i, "ranges": []} for i in range(7)]
     
@@ -117,6 +123,8 @@ def ver_horas_trabajadas(request):
     context = {
         'days_of_week': days_of_week,
         'week_offset': week_offset,
+        'week_start': week_start_str,
+        'week_end': week_end_str,
     }
     
     return render(request, 'days.html', context)
