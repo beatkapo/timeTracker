@@ -77,29 +77,28 @@ def home(request):
 
 @login_required
 def ver_horas_trabajadas(request):
-    
     user = request.user
     employee = Employee.objects.get(user_id=user.id)
     
-    # Obtener las fichadas del empleado
-    attendances = Attendance.objects.filter(employee_id=employee.id).order_by('check_in')
+    # Obtener la semana a mostrar desde los parámetros GET
+    week_offset = int(request.GET.get('week', 0))
     
-    #Separar los días. Hay que tener en cuenta los días que hay turno de noche, como de 22:00 a 6:00.
-    
-    days_of_week = [{"day":i,"ranges":[]}for i in range(7)]
-    #Guardar el dia de la semana que es hoy
+    # Guardar el día de la semana que es hoy
     day_of_week = timezone.now().weekday()
     
-    #Guardar el ultimo lunes
-    last_monday = timezone.now() - timedelta(days=day_of_week)
+    # Calcular el último lunes con el offset
+    last_monday = timezone.now() - timedelta(days=day_of_week + 7 * week_offset)
     
-    #Guardar las Attendance desde el último lunes
-    week_attendances = attendances.filter(check_in__gte=last_monday)
+    # Obtener las fichadas del empleado desde el último lunes
+    week_start = last_monday
+    week_end = last_monday + timedelta(days=7)
+    attendances = Attendance.objects.filter(employee_id=employee.id, check_in__gte=week_start, check_in__lt=week_end).order_by('check_in')
+    
+    days_of_week = [{"day": i, "ranges": []} for i in range(7)]
+    
     for day in days_of_week:
-        # day.ranges = []
         day_index = (day["day"] + 1) % 7 + 1  # Convertir de 0-6 (lunes-domingo) a 1-7 (domingo-sábado)
-        attendances_day = week_attendances.filter(check_in__week_day=day_index)
-        # attendances_day = week_attendances.filter(check_in__week_day=day["day"])
+        attendances_day = attendances.filter(check_in__week_day=day_index)
         for attendance in attendances_day:
             check_in = timezone.localtime(attendance.check_in)
             check_out = timezone.localtime(attendance.check_out)
@@ -112,12 +111,12 @@ def ver_horas_trabajadas(request):
             range_entry = {
                 'check_in': left_value,
                 'check_out': width_value - left_value
-            } 
+            }
             day["ranges"].append(range_entry)
-        
     
     context = {
-        'days_of_week' : days_of_week
+        'days_of_week': days_of_week,
+        'week_offset': week_offset,
     }
     
     return render(request, 'days.html', context)
