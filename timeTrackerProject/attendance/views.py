@@ -84,46 +84,40 @@ def ver_horas_trabajadas(request):
     # Obtener las fichadas del empleado
     attendances = Attendance.objects.filter(employee_id=employee.id).order_by('check_in')
     
-    #Separar los días. Tener en cuenta los días que hay turno de noche, como de 22:00 a 6:00.
-    days_of_week = range(7)
-    #Guardar el dia de la semana que es hoy
+    #Separar los días. Hay que tener en cuenta los días que hay turno de noche, como de 22:00 a 6:00.
     
-    day_of_week = datetime.now().weekday()
+    days_of_week = [{"day":i,"ranges":[]}for i in range(7)]
+    #Guardar el dia de la semana que es hoy
+    day_of_week = timezone.now().weekday()
+    
     #Guardar el ultimo lunes
-    last_monday = datetime.now() - timedelta(days=day_of_week)
+    last_monday = timezone.now() - timedelta(days=day_of_week)
     
     #Guardar las Attendance desde el último lunes
-    
     week_attendances = attendances.filter(check_in__gte=last_monday)
-    print('Attendances: ', week_attendances)
     for day in days_of_week:
         # day.ranges = []
-        attendances_day = week_attendances.filter(check_in__week_day=day)
+        day_index = (day["day"] + 1) % 7 + 1  # Convertir de 0-6 (lunes-domingo) a 1-7 (domingo-sábado)
+        attendances_day = week_attendances.filter(check_in__week_day=day_index)
+        # attendances_day = week_attendances.filter(check_in__week_day=day["day"])
         for attendance in attendances_day:
-            check_in = attendance.check_in
-            check_out = attendance.check_out
-            print('Check in: ', check_in)
-            print('Check out: ', check_out)
+            check_in = timezone.localtime(attendance.check_in)
+            check_out = timezone.localtime(attendance.check_out)
+            
+            if check_out is None:
+                check_out = timezone.now()
+            
             left_value = calculate_percentage(check_in)
             width_value = calculate_percentage(check_out)
-            print('Left value: ', left_value)
-            print('Width value: ', width_value)
-            # day.ranges.append({
-            #     'check_in': left_value,
-            #     'check_out': width_value - left_value
-            # })
+            range_entry = {
+                'check_in': left_value,
+                'check_out': width_value - left_value
+            } 
+            day["ranges"].append(range_entry)
         
-        
-        # days_of_week[day] = {
-        #     'left' : check_in_percentage,
-        #     'width' : checkout_percentage - check_in_percentage
-        # }
-    #Para cada día, almacenar los rangos en una lista. Un día será una lista de rangos
-    
-    
     
     context = {
-        'days_of_week' : range(7)
+        'days_of_week' : days_of_week
     }
     
     return render(request, 'days.html', context)

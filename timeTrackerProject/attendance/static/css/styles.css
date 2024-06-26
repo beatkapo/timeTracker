@@ -39,26 +39,3 @@
     position: absolute;
     top: 0;
 }
-
-/* Líneas divisorias para cada hora */
-.barra::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background-color: #ccc;
-}
-
-/* Alineación de las líneas divisorias */
-.barra::before {
-    left: 10%; /* Cambiar según se necesite */
-}
-
-.barra::before:nth-child(2n+1) {
-    height: 100%;
-}
-
-.barra::before:nth-child(2n) {
-    height: 50%;
-}

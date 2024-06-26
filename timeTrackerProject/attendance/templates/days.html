@@ -37,8 +37,7 @@
     <div class="barra">
         <!-- Los rangos se generarán dinámicamente aquí -->
          {% for range in day.ranges %}
-         <div class="rango" style="left: {{range.check_in}} width: {{ range.check_out }}%;">
-            <!-- Puedes personalizar el estilo de los rangos como desees -->
+         <div class="rango" style="left: {{range.check_in}}%; width: {{ range.check_out }}%;">
         </div>
          {% endfor %}
     </div>
