@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barra de un día</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        canvas {
+            width: 600px; /* Ancho fijo del canvas */
+            height: 20px;
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Barra de un día</h1>
+    <canvas id="barCanvas"></canvas>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var canvas = document.getElementById("barCanvas");
+            var ctx = canvas.getContext("2d");
+
+            var totalSeconds = 86400; // Total de segundos en un día
+            var barWidth = canvas.width / totalSeconds;
+            var barHeight = canvas.height;
+            var barColor = "#007bff";
+
+            // Dibujar cada segundo como una barra en el canvas
+            for (var i = 0; i < totalSeconds; i++) {
+                var x = i * barWidth;
+                ctx.fillStyle = barColor;
+                ctx.fillRect(x, 0, barWidth, barHeight);
+            }
+        });
+    </script>
+</body>
+</html>
