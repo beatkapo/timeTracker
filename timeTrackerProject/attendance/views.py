@@ -78,8 +78,6 @@ def home(request):
 @login_required
 def ver_horas_trabajadas(request):
     
-    
-    
     user = request.user
     employee = Employee.objects.get(user_id=user.id)
     
@@ -96,22 +94,30 @@ def ver_horas_trabajadas(request):
     
     #Guardar las Attendance desde el último lunes
     
-    attendances = attendances.filter(check_in__gte=last_monday)
+    week_attendances = attendances.filter(check_in__gte=last_monday)
+    print('Attendances: ', week_attendances)
     for day in days_of_week:
-        attendances_day = attendances.filter(check_in__week_day=day)
-        if attendances_day is not None:
-            check_in = attendances_day.first().check_in
-            check_out = attendances_day.last().check_out
-        
+        # day.ranges = []
+        attendances_day = week_attendances.filter(check_in__week_day=day)
+        for attendance in attendances_day:
+            check_in = attendance.check_in
+            check_out = attendance.check_out
+            print('Check in: ', check_in)
+            print('Check out: ', check_out)
             left_value = calculate_percentage(check_in)
             width_value = calculate_percentage(check_out)
+            print('Left value: ', left_value)
+            print('Width value: ', width_value)
+            # day.ranges.append({
+            #     'check_in': left_value,
+            #     'check_out': width_value - left_value
+            # })
         
         
-        
-        days_of_week[day] = {
-            'left' : check_in_percentage,
-            'width' : checkout_percentage - check_in_percentage
-        }
+        # days_of_week[day] = {
+        #     'left' : check_in_percentage,
+        #     'width' : checkout_percentage - check_in_percentage
+        # }
     #Para cada día, almacenar los rangos en una lista. Un día será una lista de rangos
     
     

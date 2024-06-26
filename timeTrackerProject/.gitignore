@@ -1,0 +1,76 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# Ignore database, media and static files
+*.db
+*.sqlite3
+/media
+/staticfiles
+/static
+/node_modules
+
+# Ignore compiled files
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.so
+
+# Ignore environment and package files
+.Python
+env/
+venv/
+ENV/
+ENV.bak/
+venv.bak/
+
+# Ignore editor and IDE files
+*.swp
+*~
+.project
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# Ignore distribution files
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+wheels/
+
+# Ignore coverage and test files
+htmlcov/
+.tox/
+.nox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+
+# Ignore virtual environment files
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Ignore Django migration files
+**/migrations/
+
+# Ignore local settings
+local_settings.py
+
+# Ignore secret keys and environment variables
+.env
+.env.*
+
+# Ignore Yarn and npm files
+yarn-debug.log
+yarn-error.log
+npm-debug.log
+package-lock.json
+yarn.lock

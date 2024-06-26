@@ -36,8 +36,8 @@
     {% for day in days_of_week %}
     <div class="barra">
         <!-- Los rangos se generarán dinámicamente aquí -->
-         {% for range in ranges %}
-         <div class="rango" style="left: {{range.check_in_percentage}} width: {{ range.check_out_percentage }}%;">
+         {% for range in day.ranges %}
+         <div class="rango" style="left: {{range.check_in}} width: {{ range.check_out }}%;">
             <!-- Puedes personalizar el estilo de los rangos como desees -->
         </div>
          {% endfor %}
