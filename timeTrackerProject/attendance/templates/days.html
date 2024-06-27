@@ -4,18 +4,9 @@
 
 {% block content %}
 <div class="contenedor">
-    <!-- Botones para cambiar de semana y mostrar la semana actual -->
-    <div class="d-flex justify-content-between align-items-center my-3">
-        <a href="?week={{ week_offset|add:-1 }}" class="btn btn-primary">
-            <i class="fas fa-arrow-left"></i> Semana Anterior
-        </a>
-        <span class="font-weight-bold">{{ week_start }} - {{ week_end }}</span>
-        <a href="?week={{ week_offset|add:1 }}" class="btn btn-primary">
-            Semana Siguiente <i class="fas fa-arrow-right"></i>
-        </a>
-    </div>
     <div class="escala-tiempo">
         <!-- Etiquetas de las horas -->
+         
         <div class="etiqueta">00</div>
         <div class="etiqueta">01</div>
         <div class="etiqueta">02</div>
@@ -42,7 +33,7 @@
         <div class="etiqueta">23</div>
         <div class="etiqueta">24</div>
     </div>
-    
+    <!-- Serà millor afegir elements com a rangos o fer els rangos desde JS? -->
     {% for day in days_of_week %}
     <div class="barra">
         <!-- Los rangos se generarán dinámicamente aquí -->

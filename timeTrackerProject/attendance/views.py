@@ -4,7 +4,7 @@ from django.contrib.auth import login as auth_login, logout as auth_logout, auth
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from .models import Employee, Attendance
 # Create your views here.
 
@@ -47,9 +47,9 @@ def home(request):
             if 'entrar_trabajo' in request.POST:
                 if not employee.is_working:
                     employee.is_working = True
-                    employee.save()
                     # Crear una nueva sesión de trabajo
-                    Attendance.objects.create(employee=employee, check_in=timezone.now())
+                    Attendance.objects.create(employee=employee, check_in=timezone.localtime(timezone.now()))
+                    employee.save()
                     messages.success(request, 'Has entrado a trabajar.')
                 else:
                     messages.warning(request, 'Ya estás trabajando actualmente.')
@@ -57,16 +57,31 @@ def home(request):
             elif 'salir_trabajo' in request.POST:
                 if employee.is_working:
                     employee.is_working = False
-                    employee.save()
+                    
                     # Completar la sesión de trabajo actual
                     work_session = Attendance.objects.filter(employee=employee, check_out__isnull=True).latest('check_in')
-                    work_session.check_out = timezone.now()
+                    now = timezone.localtime(timezone.now())
+                    check_in = timezone.localtime(work_session.check_in)
+                    # Si pasa de las 00:00, guardarlo a las 23:59 y crear otro.
+                    if now.time() < check_in.time():
+                        fin = datetime.combine(check_in.date(), time(23, 59))
+                        fin_aware = timezone.make_aware(fin)
+                        work_session.check_out = timezone.localtime(fin_aware)
+                        
+                        inicio = datetime.combine(now.date(), time(0, 0))
+                        inicio_aware = timezone.make_aware(inicio)
+                        Attendance.objects.create(employee=employee, check_in=timezone.localtime(inicio_aware), check_out=now)
+                        
+                    else:
+                        work_session.check_out = now
+                    
                     work_session.save()
+                    employee.save()
                     messages.success(request, 'Has salido de trabajar.')
                 else:
                     messages.warning(request, 'No estás trabajando actualmente.')
 
-            return redirect('home')   
+            return redirect('home')
         
         context = {
             'firstname': employee.first_name,
@@ -77,57 +92,66 @@ def home(request):
 
 @login_required
 def ver_horas_trabajadas(request):
+    
     user = request.user
     employee = Employee.objects.get(user_id=user.id)
     
-    # Obtener la semana a mostrar desde los parámetros GET
-    week_offset = int(request.GET.get('week', 0))
+    # Obtener las fichadas del empleado
+    attendances = Attendance.objects.filter(employee_id=employee.id).order_by('check_in')
     
-    # Guardar el día de la semana que es hoy
+    #Separar los días. Hay que tener en cuenta los días que hay turno de noche, como de 22:00 a 6:00.
+    
+    days_of_week = [{"day":i,"ranges":[]}for i in range(7)]
+    #Guardar el dia de la semana que es hoy
     day_of_week = timezone.now().weekday()
     
-    # Calcular el último lunes con el offset
-    last_monday = timezone.now() - timedelta(days=day_of_week + 7 * week_offset)
+    #Guardar el ultimo lunes
+    last_monday = timezone.now() - timedelta(days=day_of_week)
     
-    # Calcular el final de la semana
-    week_start = last_monday
-    week_end = last_monday + timedelta(days=6)
-    
-    # Formatear las fechas para mostrarlas
-    week_start_str = week_start.strftime("%d/%m/%Y")
-    week_end_str = week_end.strftime("%d/%m/%Y")
-    
-    # Obtener las fichadas del empleado desde el último lunes
-    attendances = Attendance.objects.filter(employee_id=employee.id, check_in__gte=week_start, check_in__lt=week_end + timedelta(days=1)).order_by('check_in')
-    
-    days_of_week = [{"day": i, "ranges": []} for i in range(7)]
-    
+    #Guardar las Attendance desde el último lunes
+    week_attendances = attendances.filter(check_in__gte=last_monday)
     for day in days_of_week:
+        # day.ranges = []
         day_index = (day["day"] + 1) % 7 + 1  # Convertir de 0-6 (lunes-domingo) a 1-7 (domingo-sábado)
-        attendances_day = attendances.filter(check_in__week_day=day_index)
+        attendances_day = week_attendances.filter(check_in__week_day=day_index)
         for attendance in attendances_day:
             check_in = timezone.localtime(attendance.check_in)
-            check_out = timezone.localtime(attendance.check_out)
+            check_out = timezone.localtime(attendance.check_out) if attendance.check_out else None
+            now = timezone.localtime(timezone.now())
             
             if check_out is None:
-                check_out = timezone.now()
+                print('No hay check_out')
+                check_out = now
+            
+            if check_out.time() < check_in.time():
+                print('Pasa de las 00:00', check_out)
+                
+                check_out = datetime.combine(check_in.date(), time(23, 59))
+                print(check_in,check_out)
+                new_left_value = calculate_percentage(datetime.combine(now.date(), time(0, 0)))
+                new_width_value = calculate_percentage(now) - new_left_value
+                new_range ={
+                    'check_in': new_left_value,
+                    'check_out': new_width_value
+                }
+                days_of_week[(day["day"] + 1) % 7]["ranges"].append(new_range)
+            
             
             left_value = calculate_percentage(check_in)
-            width_value = calculate_percentage(check_out)
+            width_value = calculate_percentage(check_out) - left_value
             range_entry = {
                 'check_in': left_value,
-                'check_out': width_value - left_value
-            }
+                'check_out': width_value
+            } 
             day["ranges"].append(range_entry)
+        
     
     context = {
-        'days_of_week': days_of_week,
-        'week_offset': week_offset,
-        'week_start': week_start_str,
-        'week_end': week_end_str,
+        'days_of_week' : days_of_week
     }
     
     return render(request, 'days.html', context)
+
 
 def calculate_percentage(datetime_obj):
     total_minutes = 24 * 60
