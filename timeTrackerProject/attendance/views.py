@@ -92,26 +92,30 @@ def home(request):
 
 @login_required
 def ver_horas_trabajadas(request):
-    
     user = request.user
     employee = Employee.objects.get(user_id=user.id)
     
     # Obtener las fichadas del empleado
     attendances = Attendance.objects.filter(employee_id=employee.id).order_by('check_in')
     
-    #Separar los días. Hay que tener en cuenta los días que hay turno de noche, como de 22:00 a 6:00.
+    # Obtener la semana desde el parámetro de la URL, por defecto será la semana actual
+    week_offset = int(request.GET.get('week', 0))
     
-    days_of_week = [{"day":i,"ranges":[]}for i in range(7)]
-    #Guardar el dia de la semana que es hoy
+    # Guardar el día de la semana que es hoy
     day_of_week = timezone.now().weekday()
     
-    #Guardar el ultimo lunes
-    last_monday = timezone.now() - timedelta(days=day_of_week)
+    # Calcular el lunes de la semana seleccionada
+    current_week_start = timezone.localtime(timezone.now()) - timedelta(days=day_of_week + 7 * week_offset)
+    current_week_end = current_week_start + timedelta(days=7)
+    last_monday = current_week_start - timedelta(days=day_of_week)
     
-    #Guardar las Attendance desde el último lunes
-    week_attendances = attendances.filter(check_in__gte=last_monday)
+    # Obtener las Attendance desde el último lunes
+    week_attendances = attendances.filter(check_in__gte=current_week_start, check_in__lt=current_week_start + timedelta(days=7))
+    
+    # Separar los días
+    days_of_week = [{"day": i, "ranges": []} for i in range(7)]
+    
     for day in days_of_week:
-        # day.ranges = []
         day_index = (day["day"] + 1) % 7 + 1  # Convertir de 0-6 (lunes-domingo) a 1-7 (domingo-sábado)
         attendances_day = week_attendances.filter(check_in__week_day=day_index)
         for attendance in attendances_day:
@@ -119,23 +123,26 @@ def ver_horas_trabajadas(request):
             check_out = timezone.localtime(attendance.check_out) if attendance.check_out else None
             now = timezone.localtime(timezone.now())
             
-            if check_out is None:
-                print('No hay check_out')
-                check_out = now
             
-            if check_out.time() < check_in.time():
+            
+            if check_out.time() < check_in.time() or check_out is None:
+                if check_out is None:
+                    check_out = now
                 print('Pasa de las 00:00', check_out)
+                print('check_out', check_out)   
                 
+                
+                new_check_in = datetime.combine(now.date(), time(0, 0))
+                new_check_out = check_out
                 check_out = datetime.combine(check_in.date(), time(23, 59))
-                print(check_in,check_out)
-                new_left_value = calculate_percentage(datetime.combine(now.date(), time(0, 0)))
-                new_width_value = calculate_percentage(now) - new_left_value
-                new_range ={
+                new_left_value = calculate_percentage(new_check_in)
+                new_width_value = calculate_percentage(new_check_out) - new_left_value
+                new_range = {
                     'check_in': new_left_value,
                     'check_out': new_width_value
                 }
-                days_of_week[(day["day"] + 1) % 7]["ranges"].append(new_range)
-            
+                if(day["day"] != 6):
+                    days_of_week[(day["day"] + 1) % 7]["ranges"].append(new_range)
             
             left_value = calculate_percentage(check_in)
             width_value = calculate_percentage(check_out) - left_value
@@ -145,9 +152,11 @@ def ver_horas_trabajadas(request):
             } 
             day["ranges"].append(range_entry)
         
-    
     context = {
-        'days_of_week' : days_of_week
+        'days_of_week': days_of_week,
+        'week_offset': week_offset,
+        'current_week_start': current_week_start,
+        'current_week_end': current_week_end
     }
     
     return render(request, 'days.html', context)
