@@ -91,7 +91,7 @@ def home(request):
         return render(request, 'home.html', context)
 
 @login_required
-def ver_horas_trabajadas(request):
+def week(request):
     user = request.user
     employee = Employee.objects.get(user_id=user.id)
     
@@ -159,7 +159,7 @@ def ver_horas_trabajadas(request):
         'current_week_end': current_week_end
     }
     
-    return render(request, 'days.html', context)
+    return render(request, 'week.html', context)
 
 
 def calculate_percentage(datetime_obj):

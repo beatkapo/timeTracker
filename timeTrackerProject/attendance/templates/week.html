@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}TimeTracker - Ver semana{% endblock %}
+
+
+{% block content %}
+<div class="contenedor">
+    <div class="semana-navegacion text-center mb-4 flex items-center justify-between">
+        <a href="?week={{ week_offset|add:1 }}" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Semana Anterior</a>
+        <span class="semana-actual mx-3 flex-grow text-center">Semana de {{ current_week_start|date:"d/m/Y" }} a {{ current_week_end|date:"d/m/Y" }}</span>
+        <a href="?week={{ week_offset|add:-1 }}" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Semana Siguiente</a>
+    </div>
+    
+    
+    <div class="escala-tiempo">
+        <!-- Etiquetas de las horas -->
+         
+        <div class="etiqueta">00</div>
+        <div class="etiqueta hidden sm:block">01</div>
+        <div class="etiqueta">02</div>
+        <div class="etiqueta hidden sm:block">03</div>
+        <div class="etiqueta">04</div>
+        <div class="etiqueta hidden sm:block">05</div>
+        <div class="etiqueta">06</div>
+        <div class="etiqueta hidden sm:block">07</div>
+        <div class="etiqueta">08</div>
+        <div class="etiqueta hidden sm:block">09</div>
+        <div class="etiqueta">10</div>
+        <div class="etiqueta hidden sm:block">11</div>
+        <div class="etiqueta">12</div>
+        <div class="etiqueta hidden sm:block">13</div>
+        <div class="etiqueta">14</div>
+        <div class="etiqueta hidden sm:block">15</div>
+        <div class="etiqueta">16</div>
+        <div class="etiqueta hidden sm:block">17</div>
+        <div class="etiqueta">18</div>
+        <div class="etiqueta hidden sm:block">19</div>
+        <div class="etiqueta">20</div>
+        <div class="etiqueta hidden sm:block">21</div>
+        <div class="etiqueta">22</div>
+        <div class="etiqueta hidden sm:block">23</div>
+        <div class="etiqueta">24</div>
+    </div>
+    <!-- Serà millor afegir elements com a rangos o fer els rangos desde JS? -->
+    {% for day in days_of_week %}
+    <div class="barra">
+        <!-- Los rangos se generarán dinámicamente aquí -->
+         {% for range in day.ranges %}
+         <div class="rango" style="left: {{range.check_in}}%; width: {{ range.check_out }}%;">
+        </div>
+         {% endfor %}
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
