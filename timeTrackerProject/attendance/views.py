@@ -10,17 +10,7 @@ import calendar
 # Create your views here.
 
 def index(request):
-    if request.user.is_authenticated:
-        return redirect('home')
-    if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            auth_login(request, user)
-            return redirect('index')
-    else:
-        form = AuthenticationForm()
-    return render(request, 'index.html')
+    return redirect('login')
 
 
 @login_required
@@ -89,9 +79,25 @@ def home(request):
 
             return redirect('home')
         
+        # Obtener el último registro de asistencia para el empleado
+        ultima_fichada = Attendance.objects.filter(employee=employee).latest('check_in')
+
+        # Calcular el tiempo transcurrido desde el último check_in
+        tiempo_transcurrido = timezone.now() - ultima_fichada.check_in
+
+        # Para mostrar el tiempo transcurrido en días, horas, minutos y segundos
+        dias = tiempo_transcurrido.days
+        horas, resto = divmod(tiempo_transcurrido.seconds, 3600)
+        minutos, segundos = divmod(resto, 60)
+        
         context = {
             'firstname': employee.first_name,
             'is_working': employee.is_working,
+            
+            'dias': dias,
+            'horas': horas,
+            'minutos': minutos,
+            'segundos': segundos,
         }
 
         return render(request, 'home.html', context)
@@ -182,7 +188,20 @@ def calculate_percentage(datetime_obj):
     minutes_since_midnight = datetime_obj.hour * 60 + datetime_obj.minute
     return (minutes_since_midnight / total_minutes) * 100
 
+def login(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            auth_login(request, user)
+            return redirect('login')
+    else:
+        form = AuthenticationForm()
+    return render(request, 'login.html')
 
 def logout(request):
     auth_logout(request)
     return redirect('index')
+

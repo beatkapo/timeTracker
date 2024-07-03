@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,40 +11,48 @@
      
   </style>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 dark:bg-gray-800">
     <header>
         {% block header %}
         
   <nav class="bg-white border-gray-200 dark:bg-gray-900">
       <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
         <a href= {% url "home" %} class="flex items-center space-x-3 rtl:space-x-reverse">
-            <img src="https://www.svgrepo.com/show/123671/time.svg" class="h-8" alt="Flowbite Logo" />
+          <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 1.75C6.615 1.75 2.25 6.115 2.25 11.5S6.615 21.25 12 21.25 21.75 16.885 21.75 11.5 17.385 1.75 12 1.75zm0 18.5a7.25 7.25 0 1 1 7.25-7.25A7.259 7.259 0 0 1 12 20.25zM12.75 6.5a.75.75 0 1 0-1.5 0v6a.75.75 0 0 0 .75.75h3.5a.75.75 0 0 0 0-1.5h-3V6.5z"/>
+        </svg>
+        
+       
+        
             <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">TimeTracker</span>
         </a>
-        <button data-collapse-toggle="navbar-default" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-default" aria-expanded="false">
-            <span class="sr-only">Open main menu</span>
-            <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
-            </svg>
-        </button>
+        
         <div class="hidden w-full md:block md:w-auto" id="navbar-default">
           <ul class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
             {% block menu_items %}
             <li>
-              <a href={% url "home" %} class="{% if request.resolver_match.url_name == 'home' %}block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500{% else %}block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent{% endif %}" aria-current="{% if request.resolver_match.url_name == 'home' %}page{% endif %}">Home</a>
+              <a href={% url "home" %} class="{% if request.resolver_match.url_name == 'home' %}block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500{% else %}block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent{% endif %}" aria-current="{% if request.resolver_match.url_name == 'home' %}page{% endif %}">Inicio</a>
           </li>
           <li>
               <a href={% url "week" %} class="{% if request.resolver_match.url_name == 'week' %}block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500{% else %}block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent{% endif %}" aria-current="{% if request.resolver_match.url_name == 'week' %}page{% endif %}">Ver más</a>
           </li>
-            {% endblock menu_items %}
+            
 
             <li>
               <a href= {% url "logout" %} class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Cerrar sesión</a>
             </li>
-            
+            {% endblock menu_items %}
           </ul>
         </div>
+        
+        <button data-collapse-toggle="navbar-default" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-default" aria-expanded="false">
+          <span class="sr-only">Open main menu</span>
+          <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
+          </svg>
+        </button>
       </div>
+      
   </nav>
   
         {% endblock header %}
@@ -52,14 +60,14 @@
     </header>
 
   <main>
-      <div class= "text-center w-full min-h-full ">
+      <div class= "flex flex-col items-center justify-center text-center w-full h-full ">
           {% block content %}
           {% endblock %}
       </div>
   </main>
 
   
-  <footer class="bg-white rounded-lg shadow m-4 dark:bg-gray-800">
+  <footer class="bg-white rounded-lg shadow m-4 dark:bg-gray-900">
     <div class="w-full mx-auto max-w-screen-xl p-4 flex items-center justify-between">
         <span class="text-sm text-gray-500 dark:text-gray-400">
             2024 <a href="https://fran.gabardaortiz.es/" class="hover:underline">@beatkapo</a>
