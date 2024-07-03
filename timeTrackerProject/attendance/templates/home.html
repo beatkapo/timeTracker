@@ -1,23 +1,30 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Inicio - TimeTracker{% endblock %}
 
 {% block content %}
 
-<div class="min-h-screen flex items-center justify-center bg-gray-100">
-    <div class="container bg-white p-8 rounded shadow-md max-w-md text-center">
-        <h1 class="mt-5 mb-4 text-2xl font-semibold">Bienvenido, {{ firstname }}</h1>
+<div class="min-h-screen rounded flex flex-col items-center justify-center">
+    <h1 class=" mb-4 text-2xl font-semibold">Bienvenido, {{ firstname }}</h1>
+
+    <div class="bg-white p-8 rounded shadow-md max-w-md text-center ">
         
         {% if is_working %}
             <p>Estado: <span class="text-green-500 font-bold">Trabajando</span></p>
-            <form method="post" class="mt-4">
+            <form method="post" class="mt-4 flex flex-col items-center">
                 {% csrf_token %}
-                <button type="submit" name="salir_trabajo" class="btn btn-danger text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 rounded-lg px-4 py-2">Salir de trabajar</button>
+                <button type="submit" name="salir_trabajo" class="bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 rounded-full px-8 py-8 flex items-center justify-center">
+                    <img src="{% static 'img/stop.svg' %}" alt="Salir del trabajar" class="w-16 h-16">
+                    
+                </button>
             </form>
         {% else %}
             <p>Estado: <span class="text-red-500 font-bold">No trabajando</span></p>
-            <form method="post" class="mt-4">
+            <form method="post" class="mt-4 flex flex-col items-center">
                 {% csrf_token %}
-                <button type="submit" name="entrar_trabajo" class="btn btn-primary text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-lg px-4 py-2">Entrar a trabajar</button>
+                <button type="submit" name="entrar_trabajo" class="bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-full px-8 py-8 flex items-center justify-center">
+                    <img src="{% static 'img/play.svg' %}" alt="Entrar a trabajar" class="w-16 h-16">
+                </button>
             </form>
         {% endif %}
 

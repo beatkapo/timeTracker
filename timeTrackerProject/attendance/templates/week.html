@@ -4,52 +4,97 @@
 
 
 {% block content %}
-<div class="contenedor">
-    <div class="semana-navegacion text-center mb-4 flex items-center justify-between">
-        <a href="?week={{ week_offset|add:1 }}" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Semana Anterior</a>
-        <span class="semana-actual mx-3 flex-grow text-center">Semana de {{ current_week_start|date:"d/m/Y" }} a {{ current_week_end|date:"d/m/Y" }}</span>
-        <a href="?week={{ week_offset|add:-1 }}" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Semana Siguiente</a>
-    </div>
-    
-    
-    <div class="escala-tiempo">
-        <!-- Etiquetas de las horas -->
-         
-        <div class="etiqueta">00</div>
-        <div class="etiqueta hidden sm:block">01</div>
-        <div class="etiqueta">02</div>
-        <div class="etiqueta hidden sm:block">03</div>
-        <div class="etiqueta">04</div>
-        <div class="etiqueta hidden sm:block">05</div>
-        <div class="etiqueta">06</div>
-        <div class="etiqueta hidden sm:block">07</div>
-        <div class="etiqueta">08</div>
-        <div class="etiqueta hidden sm:block">09</div>
-        <div class="etiqueta">10</div>
-        <div class="etiqueta hidden sm:block">11</div>
-        <div class="etiqueta">12</div>
-        <div class="etiqueta hidden sm:block">13</div>
-        <div class="etiqueta">14</div>
-        <div class="etiqueta hidden sm:block">15</div>
-        <div class="etiqueta">16</div>
-        <div class="etiqueta hidden sm:block">17</div>
-        <div class="etiqueta">18</div>
-        <div class="etiqueta hidden sm:block">19</div>
-        <div class="etiqueta">20</div>
-        <div class="etiqueta hidden sm:block">21</div>
-        <div class="etiqueta">22</div>
-        <div class="etiqueta hidden sm:block">23</div>
-        <div class="etiqueta">24</div>
-    </div>
-    <!-- Serà millor afegir elements com a rangos o fer els rangos desde JS? -->
-    {% for day in days_of_week %}
-    <div class="barra">
-        <!-- Los rangos se generarán dinámicamente aquí -->
-         {% for range in day.ranges %}
-         <div class="rango" style="left: {{range.check_in}}%; width: {{ range.check_out }}%;">
+<div class="flex flex-col items-center justify-center ">
+    <div class="w-full max-w-4xl p-4 bg-white shadow-md rounded-lg">
+        <div class="semana-navegacion text-center mb-4 flex items-center justify-between">
+            <a href="?week={{ week_offset|add:-1 }}" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Semana Anterior</a>
+            <div class="flex flex-col items-center md:items-start p-3">
+                <span class="semana-actual p-3 mx-3 flex-grow text-center text-xl font-bold ">Semana</span>
+                <div class="flex flex-col md:flex-row items-center">
+                    <span class="semana-actual  text-center">
+                        {{ current_week_start|date:"d/m/Y" }}
+                    </span>
+                    <span class="semana-actual ml-3 mr-3 text-center"> - </span>
+                    <span class="semana-actual  text-center">
+                        {{ current_week_end|date:"d/m/Y" }}
+                    </span>
+                </div>
+            </div>
+            <a href="?week={{ week_offset|add:1 }}" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Semana Siguiente</a>
         </div>
-         {% endfor %}
+        
+        <div class="escala-tiempo flex justify-between">
+            <!-- Etiquetas de las horas -->
+            <div class="etiqueta">00</div>
+            <div class="etiqueta hidden sm:block">01</div>
+            <div class="etiqueta">02</div>
+            <div class="etiqueta hidden sm:block">03</div>
+            <div class="etiqueta">04</div>
+            <div class="etiqueta hidden sm:block">05</div>
+            <div class="etiqueta">06</div>
+            <div class="etiqueta hidden sm:block">07</div>
+            <div class="etiqueta">08</div>
+            <div class="etiqueta hidden sm:block">09</div>
+            <div class="etiqueta">10</div>
+            <div class="etiqueta hidden sm:block">11</div>
+            <div class="etiqueta">12</div>
+            <div class="etiqueta hidden sm:block">13</div>
+            <div class="etiqueta">14</div>
+            <div class="etiqueta hidden sm:block">15</div>
+            <div class="etiqueta">16</div>
+            <div class="etiqueta hidden sm:block">17</div>
+            <div class="etiqueta">18</div>
+            <div class="etiqueta hidden sm:block">19</div>
+            <div class="etiqueta">20</div>
+            <div class="etiqueta hidden sm:block">21</div>
+            <div class="etiqueta">22</div>
+            <div class="etiqueta hidden sm:block">23</div>
+            <div class="etiqueta">24</div>
+            
+        </div>
+        
+        
+        {% for day in days_of_week %}
+        <div class="relative w-full h-8">
+            
+            <div class="barra relative w-full h-8 bg-gray-200 rounded">
+                <!-- Los rangos se generarán dinámicamente aquí -->
+                
+                {% for range in day.ranges %}
+                <div class="rango" style="left: {{ range.check_in }}%; width: {{ range.check_out }}%;"></div>
+                {% endfor %}
+                
+                
+                <!-- Inicial del día -->
+                <div class="absolute inset-0 flex items-center text-gray-200 text-opacity-50 font-bold text-lg mix-blend-mode-multiply" style="left:2%;">
+                    {{ day.name }}
+                </div>
+                
+                <!-- Pseudo-elemento para oscurecer la barra -->
+                <button 
+                data-tooltip-target="tooltip-top-{{ day.day }}" 
+                data-tooltip-placement="top" 
+                type="button" 
+                class="barra-overlay flowbite-tooltip-trigger"></button>
+                
+                
+            </div>
+            <div 
+            id="tooltip-top-{{ day.day }}" 
+            role="tooltip" 
+            class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700"
+        >
+            Tooltip on top
+            <div class="tooltip-arrow" data-popper-arrow></div>
+        </div>
+        </div>
+        
+        {% endfor %}
+        
+        
     </div>
-    {% endfor %}
+    
+
+                
 </div>
 {% endblock %}

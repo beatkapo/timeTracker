@@ -7,8 +7,11 @@
     <title>{% block title %}Mi Proyecto Django{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/flowbite.css' %}">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <style>
+     
+  </style>
 </head>
-<body>
+<body class="bg-gray-100">
     <header>
         {% block header %}
         
@@ -48,18 +51,35 @@
         
     </header>
 
-    <main>
-        <div class= "container flex items-center justify-center min-h-screen">
-            {% block content %}
-            {% endblock %}
-        </div>
-    </main>
+  <main>
+      <div class= "text-center w-full min-h-full ">
+          {% block content %}
+          {% endblock %}
+      </div>
+  </main>
 
-    <footer class="text-center mt-4">
-      <small>&copy; 2024 TimeTracker</small>
-  </footer>
+  
+  <footer class="bg-white rounded-lg shadow m-4 dark:bg-gray-800">
+    <div class="w-full mx-auto max-w-screen-xl p-4 flex items-center justify-between">
+        <span class="text-sm text-gray-500 dark:text-gray-400">
+            2024 <a href="https://fran.gabardaortiz.es/" class="hover:underline">@beatkapo</a>
+        </span>
+        <ul class="flex items-center text-sm font-medium text-gray-500 dark:text-gray-400">
+            <li>
+                <a href="https://github.com/beatkapo/timeTracker" class="flex items-center hover:text-blue-700 dark:hover:text-white">
+                    <svg class="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.022c0 4.424 2.865 8.168 6.839 9.489.5.091.682-.217.682-.483 0-.237-.009-.868-.014-1.704-2.782.605-3.369-1.342-3.369-1.342-.454-1.155-1.109-1.463-1.109-1.463-.908-.621.069-.608.069-.608 1.003.071 1.53 1.032 1.53 1.032.892 1.528 2.341 1.087 2.91.831.091-.647.349-1.087.635-1.338-2.221-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.27.098-2.647 0 0 .84-.27 2.75 1.026A9.58 9.58 0 0112 6.82c.851.004 1.705.115 2.504.337 1.909-1.295 2.747-1.026 2.747-1.026.546 1.377.202 2.394.1 2.647.64.7 1.027 1.595 1.027 2.688 0 3.849-2.338 4.693-4.566 4.942.359.309.678.92.678 1.855 0 1.338-.012 2.421-.012 2.75 0 .269.179.579.688.482C19.137 20.186 22 16.442 22 12.022 22 6.484 17.523 2 12 2z" clip-rule="evenodd"></path>
+                    </svg>
+                    Clone me!
+                </a>
+            </li>
+        </ul>
+    </div>
+</footer>
 
-    <script src="{% static 'js/flowbite.js' %}"></script>
+
+  <script src="{% static 'js/flowbite.js' %}"></script>
+  <script src="{% static 'js/scripts.js' %}"></script>
     
 </body>
 </html>

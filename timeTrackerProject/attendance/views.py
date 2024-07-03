@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import datetime, timedelta, time
 from .models import Employee, Attendance
+import calendar
 # Create your views here.
 
 def index(request):
@@ -25,9 +26,12 @@ def index(request):
 @login_required
 def home(request):
     if not request.user.is_authenticated:
+        print('No autenticado')
         if request.method == 'POST':
             username = request.POST['username']
             password = request.POST['password']
+            print(request.POST['username'])
+            print(request.POST['password'])
             user = authenticate(request, username=username, password=password)
             
             if user is not None:
@@ -36,8 +40,10 @@ def home(request):
                 return render(request, 'home.html')
             else:
                 return redirect('home')
-        return render(request, 'login.html')
+            
+        return redirect('login')
     else:
+        print('Autenticado')
         user = request.user
         
         employee = Employee.objects.get(user_id=user.id)  # Obtener 
@@ -102,21 +108,29 @@ def week(request):
     week_offset = int(request.GET.get('week', 0))
     
     # Guardar el día de la semana que es hoy
-    day_of_week = timezone.now().weekday()
+    today = timezone.localtime(timezone.now())
+    
     
     # Calcular el lunes de la semana seleccionada
-    current_week_start = timezone.localtime(timezone.now()) - timedelta(days=day_of_week + 7 * week_offset)
+    start_of_week = today - timedelta(days=today.weekday())  # Lunes de la semana actual
+    print(start_of_week)
+    current_week_start = start_of_week + timedelta(weeks=week_offset)
+    print(current_week_start)
+    current_week_start = datetime.combine(current_week_start.date(), time(0, 0))
     current_week_end = current_week_start + timedelta(days=7)
-    last_monday = current_week_start - timedelta(days=day_of_week)
     
     # Obtener las Attendance desde el último lunes
     week_attendances = attendances.filter(check_in__gte=current_week_start, check_in__lt=current_week_start + timedelta(days=7))
     
+    print(week_attendances)
+    
     # Separar los días
     days_of_week = [{"day": i, "ranges": []} for i in range(7)]
-    
+    day_names_es = ['L', 'M', 'X', 'J', 'V', 'S', 'D']
     for day in days_of_week:
         day_index = (day["day"] + 1) % 7 + 1  # Convertir de 0-6 (lunes-domingo) a 1-7 (domingo-sábado)
+        day_name = day_names_es[day["day"]]  # Obtener la inicial del nombre del día en español
+        day["name"] = day_name
         attendances_day = week_attendances.filter(check_in__week_day=day_index)
         for attendance in attendances_day:
             check_in = timezone.localtime(attendance.check_in)
@@ -125,24 +139,24 @@ def week(request):
             
             
             
-            if check_out.time() < check_in.time() or check_out is None:
+            if check_out is None or check_out.time() < check_in.time() :
                 if check_out is None:
                     check_out = now
-                print('Pasa de las 00:00', check_out)
-                print('check_out', check_out)   
+                    
+                else:
+                    new_check_in = datetime.combine(now.date(), time(0, 0))
+                    new_check_out = check_out
+                    check_out = datetime.combine(check_in.date(), time(23, 59))
+                    new_left_value = calculate_percentage(new_check_in)
+                    new_width_value = calculate_percentage(new_check_out) - new_left_value
                 
+                    new_range = {
+                        'check_in': new_left_value,
+                        'check_out': new_width_value
+                    }
                 
-                new_check_in = datetime.combine(now.date(), time(0, 0))
-                new_check_out = check_out
-                check_out = datetime.combine(check_in.date(), time(23, 59))
-                new_left_value = calculate_percentage(new_check_in)
-                new_width_value = calculate_percentage(new_check_out) - new_left_value
-                new_range = {
-                    'check_in': new_left_value,
-                    'check_out': new_width_value
-                }
-                if(day["day"] != 6):
-                    days_of_week[(day["day"] + 1) % 7]["ranges"].append(new_range)
+                    if(day["day"] != 6):
+                        days_of_week[(day["day"] + 1) % 7]["ranges"].append(new_range)
             
             left_value = calculate_percentage(check_in)
             width_value = calculate_percentage(check_out) - left_value
@@ -151,12 +165,13 @@ def week(request):
                 'check_out': width_value
             } 
             day["ranges"].append(range_entry)
-        
+    dotted_line_positions = [(i + 0.5) * (100 / 24) for i in range(24)]
     context = {
         'days_of_week': days_of_week,
         'week_offset': week_offset,
         'current_week_start': current_week_start,
-        'current_week_end': current_week_end
+        'current_week_end': current_week_end,
+        'dotted_line_positions': dotted_line_positions,
     }
     
     return render(request, 'week.html', context)
