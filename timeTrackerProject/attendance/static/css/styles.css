@@ -47,6 +47,8 @@ main {
     overflow: hidden; /* Para ocultar partes de los rangos que sobresalgan */
 }
 
+
+
 .barra-overlay{
     background-color: black;
     opacity: 0; /* Oculta el overlay por defecto */
@@ -80,3 +82,11 @@ main {
 }
 
 
+#navbar-default {
+    overflow: hidden;
+    transition: max-height 0.3s ease-out; /* Ajusta la duración y el tipo de transición según tus preferencias */
+  }
+  
+.tooltip{
+    position: fixed;
+}
