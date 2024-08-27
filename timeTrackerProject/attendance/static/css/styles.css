@@ -88,5 +88,5 @@ main {
   }
   
 .tooltip{
-    position: fixed;
+    position: absolute;
 }

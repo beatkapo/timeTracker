@@ -123,7 +123,7 @@ def week(request):
     current_week_start = start_of_week + timedelta(weeks=week_offset)
     print(current_week_start)
     current_week_start = datetime.combine(current_week_start.date(), time(0, 0))
-    current_week_end = current_week_start + timedelta(days=7)
+    current_week_end = current_week_start + timedelta(days=6)
     
     # Obtener las Attendance desde el último lunes
     week_attendances = attendances.filter(check_in__gte=current_week_start, check_in__lt=current_week_start + timedelta(days=7))
