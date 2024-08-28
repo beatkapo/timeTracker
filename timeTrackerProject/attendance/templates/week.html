@@ -4,10 +4,11 @@
 
 
 {% block content %}
-<div class="h-full w-full flex flex-col items-center justify-center ">
-    <div class="w-full max-w-4xl p-4 bg-white dark:bg-gray-900 dark:text-white text-gray-900 shadow-md rounded-lg">
+<div class="h-full w-full flex flex-col items-center justify-center p-5">
+    <div class="flex flex-col  w-full max-w-4xl p-4 bg-white dark:bg-gray-900 dark:text-white text-gray-900 shadow-md rounded-lg">
+        
         <div class="semana-navegacion text-center mb-4 flex items-center justify-between">
-            <a href="?week={{ week_offset|add:-1 }}" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Semana Anterior</a>
+            <a href="?week={{ week_offset|add:-1 }}" class="  text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Anterior</a>
             <div class="flex flex-col items-center md:items-start p-3">
                 <div class="flex flex-col md:flex-row items-center">
                     <span class="semana-actual  text-center">
@@ -19,7 +20,7 @@
                     </span>
                 </div>
             </div>
-            <a href="?week={{ week_offset|add:1 }}" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Semana Siguiente</a>
+            <a href="?week={{ week_offset|add:1 }}" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Siguiente</a>
         </div>
         
         <div class="escala-tiempo flex justify-between">
@@ -56,7 +57,7 @@
         {% for day in days_of_week %}
         <div class="relative w-full h-8">
             
-            <div class="barra relative w-full h-8 bg-gray-200 rounded dark:bg-gray-800">
+            <div class="barra z-10 relative w-full h-8 bg-gray-200 rounded dark:bg-gray-800">
                 <!-- Los rangos se generarán dinámicamente aquí -->
                 
                 {% for range in day.ranges %}
@@ -72,22 +73,38 @@
                 <!-- Pseudo-elemento para oscurecer la barra -->
                 <button 
                 data-tooltip-target="tooltip-top-{{ day.day }}"
-                data-tooltip-placement="top" 
+                data-tooltip-placement="top"
+                data-barra-info-target="barra-info-{{ day.day }}" 
                 type="button" 
-                class="barra-overlay flowbite-tooltip-trigger dark:bg-white"></button>
+                class="barra-overlay tooltip-trigger dark:bg-white"></button>
 
-                
             </div>
              
             <div 
             id="tooltip-top-{{ day.day }}" 
             role="tooltip" 
-            class="fixed z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
+            class="tooltip z-20 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
             00:00
-            <div class="tooltip-arrow" data-popper-arrow></div>
+                <div class="tooltip-arrow" data-popper-arrow></div>
+            
+            </div>
+                
         </div>
-        
-    </div>
+        <div id="barra-info-{{ day.day }}"
+         class="barra-info z-0 flex w-full bg-gray-800 rounded-b text-center text-white justify-between">
+            <div class= "flex flex-col">
+                <span class="jornada-text font-bold">Trabajo</span> 
+                <span >{{day.hours_worked}} {{day.hours_emote}}</span>
+            </div>
+            <div class= "flex flex-col">
+                <span class="descanso-text font-bold">Descanso</span> 
+                <span>{{day.hours_rested}}</span>
+            </div>
+            <div class= "flex flex-col">
+                <span class="extras-text font-bold">Extras</span> 
+                <span>{{day.extra_hours}}</span>
+            </div>
+        </div>
         
         {% endfor %}
                 
@@ -98,9 +115,12 @@
         const tooltipTriggers = document.querySelectorAll('.tooltip-trigger');
 
         tooltipTriggers.forEach(function(trigger) {
+            const tooltipId = trigger.getAttribute('data-tooltip-target');
+            const tooltip = document.getElementById(tooltipId);
+            const barraInfoId = trigger.getAttribute('data-barra-info-target');
+            const barraInfo = document.getElementById(barraInfoId);
+            
             trigger.addEventListener('mouseover', function(event) {
-                const tooltipId = trigger.getAttribute('data-tooltip-target');
-                const tooltip = document.getElementById(tooltipId);
 
                 tooltip.classList.add('visible');
 
@@ -110,13 +130,20 @@
             });
 
             trigger.addEventListener('mouseout', function() {
-                const tooltipId = trigger.getAttribute('data-tooltip-target');
-                const tooltip = document.getElementById(tooltipId);
-                tooltip.classList.remove('visible');
+                //tooltip.classList.remove('visible');
             });
             trigger.addEventListener('click', function(event) {
-                return
+                tooltip.classList.add('invisible');
+                const expandeds = document.querySelectorAll('.expanded');
+                expandeds.forEach(function(expanded) {
+                    if (expanded !== barraInfo){
+                        expanded.classList.toggle('expanded');
+                    }
+                });
+                barraInfo.classList.toggle('expanded');
+                
             });
+            
         });
 
         document.addEventListener('mousemove', function(event) {

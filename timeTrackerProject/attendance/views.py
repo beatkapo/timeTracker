@@ -16,12 +16,9 @@ def index(request):
 @login_required
 def home(request):
     if not request.user.is_authenticated:
-        print('No autenticado')
         if request.method == 'POST':
             username = request.POST['username']
             password = request.POST['password']
-            print(request.POST['username'])
-            print(request.POST['password'])
             user = authenticate(request, username=username, password=password)
             
             if user is not None:
@@ -33,7 +30,6 @@ def home(request):
             
         return redirect('login')
     else:
-        print('Autenticado')
         user = request.user
         
         employee = Employee.objects.get(user_id=user.id)  # Obtener 
@@ -119,30 +115,58 @@ def week(request):
     
     # Calcular el lunes de la semana seleccionada
     start_of_week = today - timedelta(days=today.weekday())  # Lunes de la semana actual
-    print(start_of_week)
     current_week_start = start_of_week + timedelta(weeks=week_offset)
-    print(current_week_start)
     current_week_start = datetime.combine(current_week_start.date(), time(0, 0))
     current_week_end = current_week_start + timedelta(days=6)
     
     # Obtener las Attendance desde el último lunes
     week_attendances = attendances.filter(check_in__gte=current_week_start, check_in__lt=current_week_start + timedelta(days=7))
     
-    print(week_attendances)
     
     # Separar los días
     days_of_week = [{"day": i, "ranges": []} for i in range(7)]
     day_names_es = ['L', 'M', 'X', 'J', 'V', 'S', 'D']
+    dotted_line_positions = [(i + 0.5) * (100 / 24) for i in range(24)]
+    
+    context = {
+                'days_of_week': days_of_week,
+                'week_offset': week_offset,
+                'current_week_start': current_week_start,
+                'current_week_end': current_week_end,
+                'dotted_line_positions': dotted_line_positions,
+            }
+    
     for day in days_of_week:
         day_index = (day["day"] + 1) % 7 + 1  # Convertir de 0-6 (lunes-domingo) a 1-7 (domingo-sábado)
         day_name = day_names_es[day["day"]]  # Obtener la inicial del nombre del día en español
         day["name"] = day_name
         attendances_day = week_attendances.filter(check_in__week_day=day_index)
+        hours_worked = 0
+        hours_rested = 0
+        extra_hours = 0
+        
+        last_check_out = None
+        
         for attendance in attendances_day:
             check_in = timezone.localtime(attendance.check_in)
             check_out = timezone.localtime(attendance.check_out) if attendance.check_out else None
+            
             now = timezone.localtime(timezone.now())
             
+            # Calcular el tiempo de descanso (el tiempo que pasa desde el ultimo check_out hasta el siguiente check_in)            
+            
+            if(last_check_out is not None):
+                hours_rested += (check_in - last_check_out).seconds / 3600
+            
+            if check_out is None:
+                check_out = now
+            
+            hours_worked += (check_out - check_in).seconds / 3600
+            
+            # Si ya se han completado 8 horas, sumar el excedente
+            if hours_worked > 8:
+                extra_hours += hours_worked - 8
+                hours_worked = 8
             
             
             if check_out is None or check_out.time() < check_in.time() :
@@ -171,14 +195,26 @@ def week(request):
                 'check_out': width_value
             } 
             day["ranges"].append(range_entry)
-    dotted_line_positions = [(i + 0.5) * (100 / 24) for i in range(24)]
-    context = {
-        'days_of_week': days_of_week,
-        'week_offset': week_offset,
-        'current_week_start': current_week_start,
-        'current_week_end': current_week_end,
-        'dotted_line_positions': dotted_line_positions,
-    }
+            
+            last_check_out = check_out
+            
+        emotes = [
+            (2, '😴'),
+            (3, '🥪'),
+            (4, '💪🏼'),
+            (7, '🙌🏼'),
+            (8, '🤏🏻'),
+            (float('inf'), '✅')  # Utiliza float('inf') para cubrir cualquier valor mayor a 8
+        ]
+
+        hours_emote = next(emote for threshold, emote in emotes if hours_worked < threshold)
+
+            
+        day['hours_emote'] = hours_emote
+        
+        day['hours_worked'] = f'{int(hours_worked)}h {int((hours_worked % 1) * 60)}m'
+        day['hours_rested'] = f'{int(hours_rested)}h {int((hours_rested % 1) * 60)}m'
+        day['extra_hours'] = f'{int(extra_hours)}h {int((extra_hours % 1) * 60)}m'
     
     return render(request, 'week.html', context)
 

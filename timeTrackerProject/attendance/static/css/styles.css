@@ -1,4 +1,7 @@
  /* Custom styles for centering the content */
+ *{
+     margin: 0;
+ }
  html, body {
     height: 100%;
     width: 100%;
@@ -13,9 +16,10 @@ main {
     justify-content: center;
 }
 
-.contenedor {
-    width: 90%;
-    margin-top: 50px; /* Espacio para la escala de tiempo */
+.contenedor{
+    width: 100%;
+    max-width: 800px;
+    padding: 0 20px;
 }
 
 .escala-tiempo {
@@ -66,6 +70,25 @@ main {
 .barra-overlay:hover {
     opacity: 0.1; /* Cambia la opacidad al 50% al pasar el ratón sobre el overlay */
 }
+.barra-info {
+    position: relative;
+    overflow: hidden; /* Para ocultar partes de los rangos que sobresalgan */
+    padding-left: 12%;
+    padding-right: 12%;
+    height: 0px;
+    transform-origin: top;
+    transition: transform 0.3s ease-in-out;
+    transform: scaleY(0);
+}
+.barra-info.expanded {
+    height: 100%;
+    transform-origin: top;
+    transition: transform 0.3s ease-in-out;
+    transform: scaleY(1);
+
+
+}
+
 
 .rango {
     height: 100%;
@@ -88,5 +111,5 @@ main {
   }
   
 .tooltip{
-    position: absolute;
+    position: fixed;
 }
