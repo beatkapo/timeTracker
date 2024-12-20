@@ -8,6 +8,8 @@ timeTrackerProject/
     .gitignore
     attendance/
         __init__.py
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+
         admin.py
         apps.py
         migrations/
@@ -80,12 +82,16 @@ timeTrackerProject/
 - Inicia sesión con tus credenciales de administrador.
 - Gestiona los usuarios y empleados.
 
+![Ejemplo de uso como administrador](timeTrackerProject/attendance/static/img/admin.gif)
+
 #### Usuario
 
 - Accede a la aplicación en `http://127.0.0.1:8000/`.
 - Inicia sesión con tus credenciales.
 - Registra tus horas de trabajo y descanso.
 - Consulta las horas trabajadas desde el menú `Ver semana`
+
+![Ejemplo de uso como usuario](timeTrackerProject/attendance/static/img/user.gif)
 
 ## Archivos Clave
 
