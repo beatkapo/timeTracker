@@ -8,8 +8,6 @@ timeTrackerProject/
     .gitignore
     attendance/
         __init__.py
-<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
-
         admin.py
         apps.py
         migrations/
